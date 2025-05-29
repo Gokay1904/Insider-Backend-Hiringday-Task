@@ -223,3 +223,35 @@ To reset matches
  ```bash
   curl -X POST "http://localhost:8080/reset
   ```
+
+
+### Output examples:
+
+First predictions:
+```yaml
+Week 1 - Championship Predictions
+Arsenal: 30.00
+Manchester United: 25.00
+Manchester City: 20.00
+Chelsea: 15.00
+Liverpool: 10.00
+
+   ```
+
+Then the results:
+   ```yaml
+Week 1 - Match Results
+- match:
+    home_team: Arsenal
+    away_team: Chelsea
+    home_goals: 2
+    away_goals: 1
+- match:
+    home_team: Liverpool
+    away_team: Manchester United
+    home_goals: 0
+    away_goals: 3
+- bye: Manchester City
+
+   ```
+
