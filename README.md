@@ -45,15 +45,86 @@ reset.sql                # SQL script to reset DB (truncate matches and standing
 main.go                  # Application entry point
 go.mod                   # Go module file
 go.sum                   # Go module dependencies
-Dockerfile               # Docker container configuration
 
 
-- `handlers/` → HTTP handlers for API endpoints (`/match`, `/standings`)  
-- `services/` → Business logic for simulations and league table calculations  
-- `models/` → Data structures such as Team and Match  
-- `router/` → Router setup and HTTP endpoint registration  
-- `league.db` → SQLite database storing all league data  
-- `reset.sql` → SQL script to reset the database for a new simulation  
+
+
+### Detailed Component Descriptions
+
+#### 🖥️ `handlers/` - API Endpoint Controllers
+- **match_handler.go**
+  - `SimulateWeekHandler`: Processes POST /simulate/week requests
+  - `SimulateAllHandler`: Processes POST /simulate/all requests
+  - Validates requests before passing to services
+  - Formats JSON responses
+
+- **table_handler.go**
+  - `StandingsHandler`: Handles GET /standings requests
+  - Retrieves and formats league table data
+  - Implements caching strategies
+
+#### 🧠 `models/` - Domain Layer
+- **team.go**
+  - `Team` struct with all statistics fields
+  - Methods like `CalculatePoints()`, `UpdateStats()`
+  - Data validation logic
+
+- **match.go**
+  - `Match` struct with week/team references
+  - `Simulate()` method using strength parameters
+  - Result enumeration (HOME_WIN, AWAY_WIN, DRAW)
+
+- **interface.go**
+  - `TeamRepository` interface
+  - `MatchRepository` interface
+  - Contract definitions for data access
+
+#### 🛣️ `router/` - HTTP Infrastructure
+- **router.go**
+  - Initializes Gorilla Mux router
+  - Registers all API endpoints
+  - Adds middleware (logging, CORS, etc)
+  - Sets content-type headers
+
+#### ⚙️ `services/` - Business Logic
+- **match_service.go**
+  - Coordinates match simulation workflow
+  - Manages week progression
+  - Updates team statistics
+
+- **simulation_service.go**
+  - Contains probabilistic algorithms
+  - Strength-based result calculation
+  - Goal generation logic
+
+- **table_service.go**
+  - Standings calculation
+  - Sorting by points/GD
+  - Position assignment
+
+#### 🗃️ Database Files
+- **schema.sql**
+  - Complete DDL for all tables
+  - Indexes and constraints
+  - Initial schema version
+
+- **seed.sql**
+  - Premier League team data
+  - Realistic strength ratings
+  - Sample match schedule
+
+- **reset.sql**
+  - TRUNCATE operations
+  - Statistics reset queries
+  - Referential integrity maintenance
+
+
+#### 🚀 Entry Point
+- **main.go**
+  - Database initialization
+  - Dependency injection
+  - Server configuration
+  - Graceful shutdown
 
 ---
 
