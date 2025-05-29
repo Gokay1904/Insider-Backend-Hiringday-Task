@@ -238,7 +238,7 @@ Liverpool: 10.00
 
    ```
 
-Then the results:
+Then the match results:
    ```yaml
 Week 1 - Match Results
 - match:
@@ -254,4 +254,30 @@ Week 1 - Match Results
 - bye: Manchester City
 
    ```
+Finally the team scores after the match is played:
 
+  ```yaml
+teams:
+  - name: Team A
+    stats:
+      Played: 1
+      Won: 1
+      Drawn: 0
+      Lost: 0
+      GF: 3
+      GA: 1
+      GoalDiff: 2
+      Points: 3
+
+  - name: Team B
+    stats:
+      Played: 1
+      Won: 0
+      Drawn: 0
+      Lost: 1
+      GF: 1
+      GA: 3
+      GoalDiff: -2
+      Points: 0
+
+ ```
