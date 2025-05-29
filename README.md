@@ -87,8 +87,8 @@ CREATE TABLE teams (
     gd INTEGER DEFAULT 0,
     points INTEGER DEFAULT 0,
     strength INTEGER NOT NULL
-); ```
-
+);
+```
 
 #### `matches` Table
 ```sql
@@ -102,14 +102,36 @@ CREATE TABLE matches (
     result TEXT,
     FOREIGN KEY(home_team_id) REFERENCES teams(id),
     FOREIGN KEY(away_team_id) REFERENCES teams(id)
-); ```
-
+);
+```
 
 ## 🚀 Available Endpoints
 
-| Endpoint         | Method | Description                  | Request Body | Response                  |
-|------------------|--------|------------------------------|--------------|---------------------------|
-| `/simulate/week` | POST   | Simulates next week's matches | None         | JSON: Simulated matches   |
+| Endpoint         | Method | Description                   | Request Body | Response                    |
+|------------------|--------|------------------------------|--------------|-----------------------------|
+| `/simulate/week` | POST   | Simulates next week's matches | None         | JSON: Simulated matches     |
 | `/simulate/all`  | POST   | Simulates all remaining weeks | None         | JSON: All simulated matches |
-| `/standings`     | GET    | Returns current league table  | None         | JSON: Team standings      |
+| `/standings`     | GET    | Returns current league table  | None         | JSON: Team standings        |
+| `/reset`         | POST   | Resets all matches and stats  | None         | Plain text confirmation     |
 
+---
+
+### How to Call Endpoints with `curl`
+
+- **Simulate a specific week**
+
+To play weekly
+  ```bash
+  curl -X POST "http://localhost:8080/simulate/week?week=2"
+  ```
+
+To simulate all
+   ```bash
+  curl -X POST "http://localhost:8080/simulate/all"
+  ```
+
+To reset matches
+
+ ```bash
+  curl -X POST "http://localhost:8080/reset
+  ```
