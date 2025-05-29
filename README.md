@@ -46,29 +46,20 @@ SQLite3 is used for data persistence. The database is managed and verified with 
 
 ### Tables
 
-#### `matches` Table
-
-Stores match details and weekly results between teams:
-
-- `id`: Match unique identifier (auto-incremented)  
-- `week`: The week number the match belongs to  
-- `home_team_id`: The ID of the home team (foreign key referencing `teams.id`)  
-- `away_team_id`: The ID of the away team (foreign key referencing `teams.id`)  
-- `home_goals`: Goals scored by the home team (default 0)  
-- `away_goals`: Goals scored by the away team (default 0)  
-- `result`: Match result summary (e.g., "Home Win", "Draw", "Away Win")  
-
-SQL for the `matches` table:
+#### `teams` Table
 
 ```sql
-CREATE TABLE matches (
+CREATE TABLE teams (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    week INTEGER NOT NULL,
-    home_team_id INTEGER NOT NULL,
-    away_team_id INTEGER NOT NULL,
-    home_goals INTEGER DEFAULT 0,
-    away_goals INTEGER DEFAULT 0,
-    result TEXT,
-    FOREIGN KEY(home_team_id) REFERENCES teams(id),
-    FOREIGN KEY(away_team_id) REFERENCES teams(id)
+    name TEXT NOT NULL,
+    position INTEGER DEFAULT 0,
+    played INTEGER DEFAULT 0,
+    won INTEGER DEFAULT 0,
+    drawn INTEGER DEFAULT 0,
+    lost INTEGER DEFAULT 0,
+    gf INTEGER DEFAULT 0,
+    ga INTEGER DEFAULT 0,
+    gd INTEGER DEFAULT 0,
+    points INTEGER DEFAULT 0,
+    strength INTEGER NOT NULL
 );
