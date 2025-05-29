@@ -1,0 +1,4 @@
+1-maçların rastlantısallığı
+2-puan kayıt ve normalizasyon
+3-şampiyonluk oranı
+4-raporlama readme
