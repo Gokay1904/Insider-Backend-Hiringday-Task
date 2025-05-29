@@ -25,7 +25,7 @@ func (s *SimulatorService) SimulateWeek(week int) error {
 		return fmt.Errorf("not enough teams to simulate matches")
 	}
 
-	// Şampiyonluk oranlarını al
+	// Şampiyonluk oranlarını al (İSTEĞE BAĞLI)
 	champProbs, err := s.GetChampionshipProbabilities()
 	if err != nil {
 		return err
@@ -49,21 +49,32 @@ func (s *SimulatorService) SimulateWeek(week int) error {
 	for _, team := range teams {
 		stats[team.ID] = &TeamStats{Team: team}
 	}
-
 	for i := 0; i < len(teams)-1; i += 2 {
 		home := teams[i]
 		away := teams[i+1]
 
 		homeGoals, awayGoals := s.simulateScore(home.Strength, away.Strength)
 
+		// Sonucu hesapla
+		var result string
+		if homeGoals > awayGoals {
+			result = "WIN"
+		} else if homeGoals < awayGoals {
+			result = "LOSE"
+		} else {
+			result = "DRAW"
+		}
+
+		// Maçı veritabanına ekle, result sütunuyla birlikte
 		_, err = s.DB.Exec(`
-			INSERT INTO matches (home_team_id, away_team_id, week, home_goals, away_goals)
-			VALUES (?, ?, ?, ?, ?)`,
-			home.ID, away.ID, week, homeGoals, awayGoals)
+        INSERT INTO matches (home_team_id, away_team_id, week, home_goals, away_goals, result)
+        VALUES (?, ?, ?, ?, ?, ?)`,
+			home.ID, away.ID, week, homeGoals, awayGoals, result)
 		if err != nil {
 			return err
 		}
 
+		// İstatistikleri güncelle
 		s.updateStats(stats[home.ID], stats[away.ID], homeGoals, awayGoals)
 
 		fmt.Printf("%s %d - %d %s\n", home.Name, homeGoals, awayGoals, away.Name)
