@@ -218,7 +218,7 @@ To simulate all
   curl -X POST "http://localhost:8080/simulate/all"
   ```
 
-To reset matches
+To manually reset matches
 
  ```bash
   curl -X POST "http://localhost:8080/reset
