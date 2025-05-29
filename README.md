@@ -192,3 +192,34 @@ Seed the team data for example: Arsenal, starting score, previous matches, stren
 ```bash
 sqlite3 league.db < seed.sql
 ```
+
+### Step 4: Run the Backend Server
+
+Start the backend application by running the following command in the project root directory:
+
+```bash
+go run main.go
+```
+This will start the server which will be listen on:
+http://localhost:8080
+
+
+### Step 5: Test the API Endpoints
+
+You can test the backend API using `curl` commands or any API client like Postman or Insomnia.
+
+To play weekly (for example week = 2)
+  ```bash
+  curl -X POST "http://localhost:8080/simulate/week?week=2"
+  ```
+
+To simulate all
+   ```bash
+  curl -X POST "http://localhost:8080/simulate/all"
+  ```
+
+To reset matches
+
+ ```bash
+  curl -X POST "http://localhost:8080/reset
+  ```
