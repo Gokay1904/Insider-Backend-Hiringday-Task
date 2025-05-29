@@ -33,7 +33,6 @@ The backend is organized into several packages to ensure clean separation of con
 | **`services/`**     | Package    | Core business logic services                                                |
 | **`database/`**     | Directory  | Database management files                                                   |
 | **`main.go`**       | File       | Application entry point                                                     |
-| **`Dockerfile`**    | File       | Container configuration                                                     |
 
 ### File Details
 
