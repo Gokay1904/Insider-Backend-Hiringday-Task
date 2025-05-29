@@ -71,6 +71,12 @@ SQLite3 is used for data persistence. The database is managed and verified with 
 
 ### Tables
 
+| Table Name | Columns                                                                                                                | Description                         |
+|------------|------------------------------------------------------------------------------------------------------------------------|-----------------------------------|
+| **teams**  | `id` (INTEGER, PK, AUTOINCREMENT), `name` (TEXT, NOT NULL), `position` (INTEGER), `played` (INTEGER), `won` (INTEGER), `drawn` (INTEGER), `lost` (INTEGER), `gf` (INTEGER), `ga` (INTEGER), `gd` (INTEGER), `points` (INTEGER), `strength` (INTEGER, NOT NULL) | Stores team info and stats         |
+| **matches**| `id` (INTEGER, PK, AUTOINCREMENT), `week` (INTEGER, NOT NULL), `home_team_id` (INTEGER, FK), `away_team_id` (INTEGER, FK), `home_goals` (INTEGER), `away_goals` (INTEGER), `result` (TEXT) | Stores match info and results      |
+
+---
 #### `teams` Table
 
 ```sql
@@ -135,3 +141,54 @@ To reset matches
  ```bash
   curl -X POST "http://localhost:8080/reset
   ```
+
+
+## ⚙️ Setup and Running the Project (Without Docker)
+
+Follow these steps to get the project up and running on your local machine:
+
+### Prerequisites
+
+- **Go** installed (version 1.18 or higher recommended)  
+  Download from: https://golang.org/dl/  
+- **SQLite3** installed (for database management)  
+  Download from: https://sqlite.org/download.html  
+- (Optional) A SQLite database browser like **DB Browser for SQLite** for inspecting and managing the database visually  
+  https://sqlitebrowser.org/
+
+---
+
+### Step 1: Clone the repository
+
+```bash
+git clone <repository-url>
+cd Insider-Backend-Hiringday-Task
+```
+
+### Step 2: Install Go dependencies
+
+Run the following command in the project root to download all necessary Go modules:
+
+```bash
+go mod tidy
+```
+
+### Step 3: Prepare the SQLite database
+
+Make sure `sqlite3` is installed on your system.
+
+Run the following command to initialize or reset the database using the provided SQL script:
+
+```bash
+sqlite3 league.db < reset.sql
+```
+
+Create tables under league database with teams and matches:
+```bash
+sqlite3 league.db < schema.sql
+```
+
+Seed the team data for example: Arsenal, starting score, previous matches, strength etc.)
+```bash
+sqlite3 league.db < seed.sql
+```
