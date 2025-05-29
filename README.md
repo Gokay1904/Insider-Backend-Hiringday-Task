@@ -23,38 +23,51 @@ All weekly simulation logic is implemented using the Go programming language, si
 
 The backend is organized into several packages to ensure clean separation of concerns:
 
-handlers/
-  match_handler.go       # Match simulation endpoint
-  table_handler.go       # Standings retrieval endpoint
+### Directory Structure
 
-models/
-  interface.go           # Interface definitions
-  match.go               # Match model
-  team.go                # Team model
+| Component           | Type       | Description                                                                 |
+|---------------------|------------|-----------------------------------------------------------------------------|
+| **`handlers/`**     | Package    | API endpoint controllers                                                    |
+| **`models/`**       | Package    | Data models and domain interfaces                                           |
+| **`router/`**       | Package    | HTTP routing configuration                                                  |
+| **`services/`**     | Package    | Core business logic services                                                |
+| **`database/`**     | Directory  | Database management files                                                   |
+| **`main.go`**       | File       | Application entry point                                                     |
+| **`Dockerfile`**    | File       | Container configuration                                                     |
 
-router/
-  router.go              # HTTP router setup
-
-services/
-  match_service.go       # Business logic for matches
-  simulation_service.go  # Match result calculation
-  table_service.go       # Standings and table logic
-
-league.db                # SQLite database file
-reset.sql                # SQL script to reset DB (truncate matches and standings)
-main.go                  # Application entry point
-go.mod                   # Go module file
-go.sum                   # Go module dependencies
-Dockerfile               # Docker container configuration
+### File Details
 
 
-- `handlers/` → HTTP handlers for API endpoints (`/match`, `/standings`)  
-- `services/` → Business logic for simulations and league table calculations  
-- `models/` → Data structures such as Team and Match  
-- `router/` → Router setup and HTTP endpoint registration  
-- `league.db` → SQLite database storing all league data  
-- `reset.sql` → SQL script to reset the database for a new simulation  
+#### Handlers Package
 
+| File                | Responsibilities                                                                 |
+|---------------------|---------------------------------------------------------------------------------|
+| `match_handler.go`  | - Processes `/simulate/week` and `/simulate/all` requests<br>- Validates inputs<br>- Formats JSON responses |
+| `table_handler.go`  | - Handles GET `/standings` requests<br>- Implements response caching<br>- Error handling |
+
+#### Models Package
+
+| File          | Key Components                                                                 |
+|---------------|-------------------------------------------------------------------------------|
+| `team.go`     | - `Team` struct<br>- `CalculatePoints()`<br>- `UpdateStats()`<br>- Validation logic |
+| `match.go`    | - `Match` struct<br>- `Simulate()` method<br>- Result enums (HOME_WIN, etc.)      |
+| `interface.go`| - `TeamRepository` interface<br>- `MatchRepository` interface                     |
+
+#### Services Package
+
+| File                   | Core Logic                                                                 |
+|------------------------|----------------------------------------------------------------------------|
+| `match_service.go`     | - Week progression<br>- Team stats updates<br>- Simulation coordination    |
+| `simulation_service.go`| - Probability algorithms<br>- Strength-based calculations<br>- Goal generation |
+| `table_service.go`     | - Standings calculation<br>- Sorting logic<br>- Position assignment        |
+
+#### Database Files
+
+| File        | Purpose                                                                 |
+|-------------|-------------------------------------------------------------------------|
+| `schema.sql`| - Table creation<br>- Indexes and constraints<br>- Database versioning  |
+| `seed.sql`  | - Initial team data<br>- Match schedule<br>- Realistic strength ratings |
+| `reset.sql` | - Data truncation<br>- Statistics reset<br>- Referential integrity      |
 ---
 
 ## 🧠 Simulation Logic
