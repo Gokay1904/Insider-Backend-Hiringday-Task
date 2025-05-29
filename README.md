@@ -60,7 +60,32 @@ Dockerfile               # Docker container configuration
 ## 🧠 Simulation Logic
 
 - Each team has a **strength score**, derived from actual Premier League performance.  
-- Matches are simulated **weekly**, with outcomes influenced by team strength.  
+- Matches are simulated **weekly**, with outcomes influenced by team strength.
+
+### ➤ Normalize Team Strength
+Each team's strength is scaled between 0 and 1:
+
+- `homeFactor = homeStrength / 100`
+- `awayFactor = awayStrength / 100`
+
+### ➤ Calculate Expected Goals
+Expected goals (λ) are computed using team strength and home advantage:
+
+- `homeLambda = 1.8 * homeFactor`
+- `awayLambda = 1.0 * awayFactor`
+
+### ➤ Simulate Goals with Poisson Distribution
+The number of goals is sampled using the Poisson distribution:
+
+- `P(k; λ) = (e^-λ * λ^k) / k!`
+
+Where:
+- `P(k; λ)` is the probability of scoring exactly `k` goals
+- `λ` is the expected goal count for that team
+
+### ➤ Score Limiting
+To ensure realism, the number of goals is capped at **5 per team**.
+
 - League standings update automatically after every simulated week.
 
 ---
@@ -111,6 +136,23 @@ CREATE TABLE matches (
 );
 ```
 
+
+#### `seed` code for initial conditions of selected teams
+```sql
+
+-- Clear existing data
+DELETE FROM teams;
+DELETE FROM matches;
+
+-- Insert 5 teams with different strengths (example data)
+INSERT INTO teams (name, position, played, won, drawn, lost, gf, ga, gd, points, strength) VALUES
+('Arsenal', 1, 0, 0, 0, 0, 0, 0, 0, 0, 85),
+('Manchester City', 2, 0, 0, 0, 0, 0, 0, 0, 0, 90),
+('Manchester United', 3, 0, 0, 0, 0, 0, 0, 0, 0, 78),
+('Chelsea', 4, 0, 0, 0, 0, 0, 0, 0, 0, 80),
+('Liverpool', 5, 0, 0, 0, 0, 0, 0, 0, 0, 88);
+```
+
 ## 🚀 Available Endpoints
 
 | Endpoint         | Method | Description                   | Request Body | Response                    |
@@ -121,6 +163,8 @@ CREATE TABLE matches (
 | `/reset`         | POST   | Resets all matches and stats  | None         | Plain text confirmation     |
 
 ---
+
+📝 Note: All match results and league updates triggered by these endpoints are automatically persisted in the SQLite database (league.db) under the teams and matches tables.
 
 ### How to Call Endpoints with `curl`
 
@@ -188,7 +232,7 @@ Create tables under league database with teams and matches:
 sqlite3 league.db < schema.sql
 ```
 
-Seed the team data for example: Arsenal, starting score, previous matches, strength etc.)
+At the start of the simulation, each team—such as Arsenal—is initialized with predefined attributes including starting scores, match history (if applicable), and a strength rating. This seed data represents the initial conditions for each team and can be easily adjusted to simulate different league dynamics or difficulty levels.
 ```bash
 sqlite3 league.db < seed.sql
 ```
@@ -218,7 +262,7 @@ To simulate all
   curl -X POST "http://localhost:8080/simulate/all"
   ```
 
-To reset matches
+To manually reset matches
 
  ```bash
   curl -X POST "http://localhost:8080/reset
@@ -238,7 +282,7 @@ Liverpool: 10.00
 
    ```
 
-Then the results:
+Then the match results:
    ```yaml
 Week 1 - Match Results
 - match:
@@ -254,4 +298,30 @@ Week 1 - Match Results
 - bye: Manchester City
 
    ```
+Finally the team scores after the match is played:
 
+  ```yaml
+teams:
+  - name: Team A
+    stats:
+      Played: 1
+      Won: 1
+      Drawn: 0
+      Lost: 0
+      GF: 3
+      GA: 1
+      GoalDiff: 2
+      Points: 3
+
+  - name: Team B
+    stats:
+      Played: 1
+      Won: 0
+      Drawn: 0
+      Lost: 1
+      GF: 1
+      GA: 3
+      GoalDiff: -2
+      Points: 0
+
+ ```
