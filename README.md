@@ -88,3 +88,19 @@ CREATE TABLE teams (
     points INTEGER DEFAULT 0,
     strength INTEGER NOT NULL
 );
+
+#### `matches` Table
+
+```sql
+CREATE TABLE matches (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    week INTEGER NOT NULL,
+    home_team_id INTEGER NOT NULL,
+    away_team_id INTEGER NOT NULL,
+    home_goals INTEGER DEFAULT 0,
+    away_goals INTEGER DEFAULT 0,
+    result TEXT,
+    FOREIGN KEY(home_team_id) REFERENCES teams(id),
+    FOREIGN KEY(away_team_id) REFERENCES teams(id)
+);
+
