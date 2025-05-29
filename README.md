@@ -22,6 +22,26 @@ All weekly simulation logic is implemented using the Go programming language, si
 ## 🏗️ Solution Structure
 
 The backend is organized into several packages to ensure clean separation of concerns:
+.
+├── handlers/
+│   ├── match_handler.go       # Match simulation endpoint
+│   └── table_handler.go       # Standings retrieval endpoint
+├── models/
+│   ├── interface.go           # Interface definitions
+│   ├── match.go               # Match model
+│   └── team.go                # Team model
+├── router/
+│   └── router.go              # HTTP router setup
+├── services/
+│   ├── match_service.go       # Business logic for matches
+│   ├── simulation_service.go  # Match result calculation
+│   └── table_service.go       # Standings and table logic
+├── league.db                  # SQLite database file
+├── reset.sql                  # SQL script to reset DB (truncate matches and standings)
+├── main.go                    # Application entry point
+├── go.mod                     # Go module file
+├── go.sum                     # Go module dependencies
+└── Dockerfile                 # Docker container configuration
 
 - `handlers/` → HTTP handlers for API endpoints (`/match`, `/standings`)  
 - `services/` → Business logic for simulations and league table calculations  
