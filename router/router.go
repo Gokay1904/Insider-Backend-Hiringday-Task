@@ -28,8 +28,37 @@ func (r *Router) SetupRoutes() http.Handler {
 	mux.HandleFunc("/simulate/week", r.SimulateWeekHandler).Methods("POST")
 	mux.HandleFunc("/simulate/all", r.SimulateAllHandler).Methods("POST")
 	mux.HandleFunc("/standings", r.StandingsHandler).Methods("GET")
+	mux.HandleFunc("/reset", r.ResetHandler).Methods("POST")
 
 	return mux
+}
+func (r *Router) ResetHandler(w http.ResponseWriter, req *http.Request) {
+	_, err := r.db.Exec("DELETE FROM matches;")
+	if err != nil {
+		http.Error(w, "Failed to delete matches: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	_, err = r.db.Exec(`
+		UPDATE teams
+		SET
+			position = 0,
+			played = 0,
+			won = 0,
+			drawn = 0,
+			lost = 0,
+			gf = 0,
+			ga = 0,
+			gd = 0,
+			points = 0;
+	`)
+	if err != nil {
+		http.Error(w, "Failed to reset teams: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Database reset successfully"))
 }
 
 // /simulate/week endpointi, istekte "week" parametresi bekliyor (POST form veya query param)
