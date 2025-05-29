@@ -101,6 +101,12 @@ To ensure realism, the number of goals is capped at **5 per team**.
 
 - League standings update automatically after every simulated week.
 
+- Prior to each match simulation, the team's projected championship rate is calculated as follows:
+- `Championship Rate_Team = Points_Team / Sum(Points_AllTeams)`
+  - `Points_Team`: Current point total of the team
+  - `Sum(Points_AllTeams)`: Total points accumulated by all teams in the league
+
+
 ---
 
 ## 🏟️ Database Design
@@ -294,6 +300,8 @@ Chelsea: 15.00
 Liverpool: 10.00
 
    ```
+
+Expression for predictions: - `Championship Rate_Team = Points_Team / Sum(Points_AllTeams)`
 
 Then the match results:
    ```yaml
