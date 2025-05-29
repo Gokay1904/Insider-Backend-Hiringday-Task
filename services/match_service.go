@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"insider-case/models"
+	"math"
 	"math/rand"
 	"time"
 )
@@ -174,30 +175,49 @@ func (s *SimulatorService) GetChampionshipProbabilities() (map[int]float64, erro
 	teamCount := len(pointsMap)
 	for id, pts := range pointsMap {
 		if totalPoints > 0 {
-			probs[id] = float64(pts) / float64(totalPoints)
+			probs[id] = float64(pts) / float64(totalPoints) // puanın toplam puana oranı
 		} else {
-			probs[id] = 1.0 / float64(teamCount)
+			probs[id] = 1.0 / float64(teamCount) // eşit olasılık (toplam puan 0 ise)
 		}
 	}
 
 	return probs, nil
 }
 
+func poisson(lambda float64) int {
+	L := math.Exp(-lambda)
+	k := 0
+	p := 1.0
+	for p > L {
+		k++
+		p *= rand.Float64()
+	}
+	return k - 1
+}
+
 // SimulateMatch simulates a match result based on team strengths and returns scores
 func (m *MatchService) SimulateMatch(homeStrength, awayStrength int) (int, int) {
 	rand.Seed(time.Now().UnixNano())
 
-	maxHomeGoals := homeStrength/10 + 2
-	if maxHomeGoals > 5 {
-		maxHomeGoals = 5
+	// Gücü normalize et (örnek: strength 0-100 arasıysa)
+	homeFactor := float64(homeStrength) / 100.0
+	awayFactor := float64(awayStrength) / 100.0
+
+	// Ortalama gol sayısı, ev sahibi avantajı ile
+	homeLambda := 1.8 * homeFactor // ev sahibi biraz avantajlı
+	awayLambda := 1.0 * awayFactor
+
+	homeGoals := poisson(homeLambda)
+	awayGoals := poisson(awayLambda)
+
+	// Maks 5 gol sınırı koyabilirsin
+	if homeGoals > 5 {
+		homeGoals = 5
 	}
-	maxAwayGoals := awayStrength/10 + 2
-	if maxAwayGoals > 5 {
-		maxAwayGoals = 5
+	if awayGoals > 5 {
+		awayGoals = 5
 	}
 
-	homeGoals := rand.Intn(maxHomeGoals)
-	awayGoals := rand.Intn(maxAwayGoals)
 	return homeGoals, awayGoals
 }
 

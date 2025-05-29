@@ -98,5 +98,40 @@ func (s *SimulatorService) GetCurrentStandings() ([]TeamStats, error) {
 		return standings[i].GF > standings[j].GF
 	})
 
+	// İstatistikleri güncelledikten sonra veritabanını da güncelle
+	if err := s.updateTeamsStatsInDB(stats); err != nil {
+		return nil, err
+	}
+
 	return standings, nil
+}
+
+func (s *SimulatorService) updateTeamsStatsInDB(stats map[int]*TeamStats) error {
+	for _, stat := range stats {
+		_, err := s.DB.Exec(`
+			UPDATE teams SET
+				played = ?,
+				won = ?,
+				drawn = ?,
+				lost = ?,
+				points = ?,
+				gf = ?,
+				ga = ?,
+				gd = ?
+			WHERE id = ?`,
+			stat.Played,
+			stat.Won,
+			stat.Drawn,
+			stat.Lost,
+			stat.Points,
+			stat.GF,
+			stat.GA,
+			stat.GoalDiff,
+			stat.Team.ID,
+		)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

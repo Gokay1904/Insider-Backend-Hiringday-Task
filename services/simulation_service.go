@@ -69,17 +69,53 @@ func (s *SimulatorService) SimulateWeek(week int) error {
 		fmt.Printf("%s %d - %d %s\n", home.Name, homeGoals, awayGoals, away.Name)
 	}
 
+	fmt.Printf("\nWeek %d Team Stats:\n", week)
+	fmt.Printf("%-15s %6s %6s %6s %6s %6s %6s %6s %6s\n",
+		"Team", "P", "W", "D", "L", "GF", "GA", "GD", "Pts")
+
+	for _, team := range teams {
+		st := stats[team.ID]
+		fmt.Printf("%-15s %6d %6d %6d %6d %6d %6d %6d %6d\n",
+			team.Name,
+			st.Played,
+			st.Won,
+			st.Drawn,
+			st.Lost,
+			st.GF,
+			st.GA,
+			st.GoalDiff,
+			st.Points)
+	}
+
 	return nil
 }
 
 func (s *SimulatorService) simulateScore(homeStrength, awayStrength int) (int, int) {
 	rand.Seed(time.Now().UnixNano())
-	homeGoals := rand.Intn(homeStrength/10 + 2)
-	awayGoals := rand.Intn(awayStrength/10 + 2)
+
+	// Güç değerini normalize et (örnek max 100 üzerinden)
+	homeFactor := float64(homeStrength) / 100.0
+	awayFactor := float64(awayStrength) / 100.0
+
+	// Ortalama gol sayısını belirle (ev sahibi avantajı da var)
+	homeLambda := 1.8 * homeFactor
+	awayLambda := 1.0 * awayFactor
+
+	homeGoals := poisson(homeLambda)
+	awayGoals := poisson(awayLambda)
+
+	// Maksimum gol sınırı koy
+	if homeGoals > 5 {
+		homeGoals = 5
+	}
+	if awayGoals > 5 {
+		awayGoals = 5
+	}
+
 	return homeGoals, awayGoals
 }
 
-func (s *SimulatorService) updateStats(home, away *TeamStats, homeGoals, awayGoals int) {
+func (s *SimulatorService) updateStats(home, away *TeamStats, homeGoals, awayGoals int) error {
 	home.Played++
 	away.Played++
 
@@ -106,6 +142,27 @@ func (s *SimulatorService) updateStats(home, away *TeamStats, homeGoals, awayGoa
 		home.Points++
 		away.Points++
 	}
+
+	// Veritabanına yaz
+	_, err := s.DB.Exec(`
+		UPDATE teams SET
+			played = ?, won = ?, drawn = ?, lost = ?, points = ?, gf = ?, ga = ?, gd = ?
+		WHERE id = ?`,
+		home.Played, home.Won, home.Drawn, home.Lost, home.Points, home.GF, home.GA, home.GoalDiff, home.Team.ID)
+	if err != nil {
+		return err
+	}
+
+	_, err = s.DB.Exec(`
+		UPDATE teams SET
+			played = ?, won = ?, drawn = ?, lost = ?, points = ?, gf = ?, ga = ?, gd = ?
+		WHERE id = ?`,
+		away.Played, away.Won, away.Drawn, away.Lost, away.Points, away.GF, away.GA, away.GoalDiff, away.Team.ID)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *SimulatorService) getTeams() ([]models.Team, error) {
