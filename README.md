@@ -23,7 +23,7 @@ All weekly simulation logic is implemented using the Go programming language, si
 
 The backend is organized into several packages to ensure clean separation of concerns:
 
-## 🗂️ Directory Structure
+### Directory Structure
 
 | Component           | Type       | Description                                                                 |
 |---------------------|------------|-----------------------------------------------------------------------------|
@@ -35,17 +35,17 @@ The backend is organized into several packages to ensure clean separation of con
 | **`main.go`**       | File       | Application entry point                                                     |
 | **`Dockerfile`**    | File       | Container configuration                                                     |
 
-## 📄 File Details
+### File Details
 
 
-### 🖥️ Handlers Package
+#### Handlers Package
 
 | File                | Responsibilities                                                                 |
 |---------------------|---------------------------------------------------------------------------------|
 | `match_handler.go`  | - Processes `/simulate/week` and `/simulate/all` requests<br>- Validates inputs<br>- Formats JSON responses |
 | `table_handler.go`  | - Handles GET `/standings` requests<br>- Implements response caching<br>- Error handling |
 
-### 🧠 Models Package
+#### Models Package
 
 | File          | Key Components                                                                 |
 |---------------|-------------------------------------------------------------------------------|
@@ -53,7 +53,7 @@ The backend is organized into several packages to ensure clean separation of con
 | `match.go`    | - `Match` struct<br>- `Simulate()` method<br>- Result enums (HOME_WIN, etc.)      |
 | `interface.go`| - `TeamRepository` interface<br>- `MatchRepository` interface                     |
 
-### ⚙️ Services Package
+#### Services Package
 
 | File                   | Core Logic                                                                 |
 |------------------------|----------------------------------------------------------------------------|
@@ -61,7 +61,7 @@ The backend is organized into several packages to ensure clean separation of con
 | `simulation_service.go`| - Probability algorithms<br>- Strength-based calculations<br>- Goal generation |
 | `table_service.go`     | - Standings calculation<br>- Sorting logic<br>- Position assignment        |
 
-### 🗃️ Database Files
+#### Database Files
 
 | File        | Purpose                                                                 |
 |-------------|-------------------------------------------------------------------------|
